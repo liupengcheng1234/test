@@ -1,93 +1,91 @@
-��һ�� ������Ӿ�Ӳ����������
-��ʵ��Ŀ�ġ�
-�������ü�����Ӿ���OpenCV��������ͷ��Ƶ����Ƶ�ļ��ķ�����
-��ʵ�����͡�
-��֤�ԡ�
-��ʵ�黷����
-Ubuntu16.04 + Code::Blocks 13.12 + ������Ӿ���OpenCV
-��ʵ��ԭ����
-1.	�ڳ�����ʹ�ü�����Ӿ���OpenCV
-(1)	����ͷ�ļ�
-���������ӣ�#include <opencv2/opencv.hpp>
-����CodeBlocks��Setttings������OpenCV�İ���Ŀ¼�Ϳ�Ŀ¼����ע��Ҫ����Ϊ�Լ������ϵ���ӦĿ¼�����岽����ͼ1��ͼ2��ͼ3��ͼ4��ʾ������Ѿ����úã���������ֻҪ����һ�μ��ɡ�
-ͼ1. settings->compiler
-
-ͼ2. ���ӿ��ļ�
-ͼ3.����ͷ�ļ�
-
-ͼ4.����Linux���е�.so�ļ�
-(2)	ʹ�������ռ�
-using namespace cv;	//ʹ��OpenCV�������ռ�cv
-using namespace std;	//ʹ�ñ�׼ģ���������ռ�std
-2.	��������ͷ����Ƶ
-	//��ʼ����Ƶ��׽��
+第一章 计算机视觉硬件技术介绍
+【实验目的】
+掌握利用计算机视觉库OpenCV播放摄像头视频或视频文件的方法。
+【实验类型】
+验证性
+【实验环境】
+Ubuntu16.04 + Code::Blocks 13.12 + 计算机视觉库OpenCV
+【实验原理】
+1.	在程序中使用计算机视觉库OpenCV
+(1)	包含头文件
+代码中添加：#include <opencv2/opencv.hpp>
+并在CodeBlocks的Setttings中添加OpenCV的包含目录和库目录，请注意要设置为自己电脑上的相应目录，具体步骤如图1，图2，图3，图4所示。如果已经设置好，请跳过，只要设置一次即可。
+图1. settings->compiler
+图2. 添加库文件
+图3.添加头文件
+图4.添加Linux运行的.so文件
+(2)	使用命名空间
+using namespace cv;	//使用OpenCV的命名空间cv
+using namespace std;	//使用标准模板库的命名空间std
+2.	播放摄像头的视频
+	//初始化视频捕捉器
 	VideoCapture cap;
-	// ��Ĭ������ͷ�����������ͷ��������������δ���
+	// 打开默认摄像头，如果有摄像头，请启用下面这段代码
 	cap.open(0);
-	// ����Ƿ���������ͷ������Ƶ�ļ��Ƿ�򿪳ɹ�
+	// 检查是否开启了摄像头或者视频文件是否打开成功
 	if (!cap.isOpened()) {
-		cerr << "Error��cannot open video.\n";
+		cerr << "Error，cannot open video.\n";
 		return -1;	}
 	Mat frame;
 	while(true)
 	{
-		// ������ͷ������Ƶ�ļ��ж�ȡһ֡��Ƶͼ�񣬲�������frame��
+		// 从摄像头或者视频文件中读取一帧视频图像，并保存在frame中
 		cap.read(frame);
-		// ����ȡ�Ƿ�ɹ�
+		// 检查读取是否成功
 		if (frame.empty()) {
 			cerr << "error, video is empty.\n";
 			break;
 		}
-		//�ڴ���Live����ʾ��ǰ֡������
+		//在窗口Live中显示当前帧的内容
 		imshow("Live", frame);
-		//��ǰ֡�Ļ���ͣ��50����
+		//当前帧的画面停留50毫秒
 		if (waitKey(50)>= 0)
 			break;	
 }
-3.	������Ƶ�ļ�
-��2�еĴ�����ͷ����Ϊ����Ƶ�ļ����ɡ�
+3.	播放视频文件
+把2中的打开摄像头语句改为打开视频文件即可。
 cap.open(0);	
-��Ϊ
+改为
 cap.open("/root/Desktop/Computer_Vision/image/crab.mp4");
-����˫������Ҫָ����Ƶ�ļ����ڵ�·�����ļ�����
+其中双引号中要指出视频文件所在的路径和文件名。
 
-��ʵ�����ݡ�
-1.	������Ƶ�ļ�������ͷ��Ƶ
-��ʵ�鲽�衿
-1.	������Ƶ�ļ�������ͷ��Ƶ
-(1)	��Code::Blocks
-��ϵͳ��Ѱ��Code::Blocks˫���Ϳ��Դ򿪸�����
-(2)	�½���ĿReadVideo
-���file-->new-->Project...-->Empty project���Ӷ�Ӧ��Ϣ����ͼ5��ͼ6��ʾ����ͼ5��������Ŀ����ΪReadVideo����ͨ����ť��������ѡ����Ŀ�����λ�á�
+【实验内容】
+1.	播放视频文件或摄像头视频
+【实验步骤】
+1.	播放视频文件或摄像头视频
+(1)	打开Code::Blocks
+在系统中寻找Code::Blocks双击就可以打开该软件
+(2)	新建项目ReadVideo
+点击file-->new-->Project...-->Empty project添加对应信息，如图5、图6所示。在图5中输入项目名称为ReadVideo，并通过按钮“…”来选择项目保存的位置。
 
-ͼ5. �½���Ŀ�Ĳ���1
+图5. 新建项目的步骤1
 
-ͼ6. �½���Ŀ�Ĳ���2
-(3)	�½��ļ�ReadVideo.cpp
-ͨ��File-->new-->empty file���ߵ���������Ͻ������ļ�ͼ�꣬�޸�����ΪReadVideo.cpp����ͼ7��ͼ8��ʾ��
-ͼ7.�����½���
+图6. 新建项目的步骤2
+(3)	新建文件ReadVideo.cpp
+通过File-->new-->empty file或者点击软件左上角添加文件图标，修改名称为ReadVideo.cpp，如图7、图8所示。
+图7.添加新建项
 
-ͼ8.����cpp�ļ�
-(4)	�༭ReadVideo.cpp
-�ڸ��ļ����������´��룺
+图8.添加cpp文件
+(4)	编辑ReadVideo.cpp
+在该文件中输入如下代码：
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
-using namespace cv;		//ʹ��OpenCV�������ռ�cv
-using namespace std;	//ʹ�ñ�׼ģ���������ռ�std
+using namespace cv;		//使用OpenCV的命名空间cv
+using namespace std;	//使用标准模板库的命名空间std
 
 int main()
 {
-	//��ʼ����Ƶ��׽��
+	//初始化视频捕捉器
 	VideoCapture cap;
-	// ��Ĭ������ͷ�����������ͷ��������������δ���
+	// 打开默认摄像头，如果有摄像头，请启用下面这段代码
 	//cap.open(0);
-	//����Ƶ�ļ������ʹ������ͷ����ע�͵�������һ��
+	//打开视频文件，如果使用摄像头，请注释掉下面这一句
 	cap.open("/root/Desktop/Computer_Vision/image/crab.mp4");
 
-	// ����Ƿ���������ͷ������Ƶ�ļ��Ƿ�򿪳ɹ�
+	// 检查是否开启了摄像头或者视频文件是否打开成功
 	if (!cap.isOpened()) {
-		cerr << "Error��Cannot open video.\n";
+		cerr << "Error！Cannot open video.\n";
 		return -1;
 	}
 
@@ -97,16 +95,16 @@ int main()
 	Mat frame;
 	while(true)
 	{
-		// ������ͷ������Ƶ�ļ��ж�ȡһ֡��Ƶͼ�񣬲�������frame��
+		// 从摄像头或者视频文件中读取一帧视频图像，并保存在frame中
 		cap.read(frame);
-		// ����ȡ�Ƿ�ɹ�
+		// 检查读取是否成功
 		if (frame.empty()) {
 			cerr << "Error, the video is empty.\n";
 			break;
 		}
-		//�ڴ���Live����ʾ��ǰ֡������
+		//在窗口Live中显示当前帧的内容
 		imshow("Live", frame);
-		//��ǰ֡�Ļ���ͣ��50����
+		//当前帧的画面停留50毫秒
 		if (waitKey(50)>= 0)
 			break;
 	}
@@ -114,21 +112,21 @@ int main()
 	return 0;
 }
 
-(5)	���ɿ�ִ���ļ�
-ͨ��Build-->Build and run,���ɿ�ִ���ļ����ͻ��������������ʾ���µ���Ϣ��������һ�仰��ʾ���ǣ�0 errors(),0 warning(s)�Ǿ�˵������û���﷨�����Ӵ��󡣷���Ļ�������Ҫ�����﷨����������ϵĴ���
+(5)	生成可执行文件
+通过Build-->Build and run,生成可执行文件。就会在输出窗口中显示如下的信息，如果最后一句话显示的是：0 errors(),0 warning(s)那就说明代码没有语法和链接错误。否则的话，就需要纠正语法错误或配置上的错误。
 
-ͼ9. ������ڵ���Ϣ
+图9. 输出窗口的信息
 
 
-(6)	���г���
-����޷�������Ƶ�ļ����������µ���ʾ��Ϣ��������Ƶ�ļ���·�����ļ����Ƿ���ȷ��
-"Error��Cannot open video.\n"
+(6)	运行程序
+如果无法播放视频文件，输入如下的提示信息，请检查视频文件的路径和文件名是否正确。
+"Error！Cannot open video.\n"
 
-���κ�ϰ�⡿
-1.	�򿪲���ʾͼ��
-��ʾ��
-ʹ�����������ͼ���ļ�
-Mat img= imread("ͼ���ļ���·�����ļ���",CV_LOAD_IMAGE_UNCHANGED);
-ʹ���������䣬�Ϳ����ڴ���title����ʾͼ��
+【课后习题】
+1.	打开并显示图像
+提示：
+使用下面的语句打开图像文件
+Mat img= imread("图像文件的路径和文件名",CV_LOAD_IMAGE_UNCHANGED);
+使用下面的语句，就可以在窗口title中显示图像
 imshow("title",img);
-waitKey(); //�ȴ����������������ʾͼ��
+waitKey(); //等待，按任意键结束显示图像
