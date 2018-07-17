@@ -3,14 +3,14 @@ import pandas as pd
 import math
 from scipy.io import loadmat
 
-¼ÆËã
+è®¡ç®—1
 
 classes = 2
 max_features = 10000 - 1 
-#×îºóÒ»ÁĞÎª·ÖÀà0/1
+#æœ€åä¸€åˆ—ä¸ºåˆ†ç±»0/1
 frac1 = 0.8
-frac2 = 0.1 #·ÖÅäÑµÁ·¼¯¡¢ÑéÖ¤¼¯¡¢²âÊÔ¼¯±ÈÀı
-#ÉèÖÃÏÈÑé²ÎÊıalphaºÍbeta
+frac2 = 0.1 #åˆ†é…è®­ç»ƒé›†ã€éªŒè¯é›†ã€æµ‹è¯•é›†æ¯”ä¾‹
+#è®¾ç½®å…ˆéªŒå‚æ•°alphaå’Œbeta
 alpha = np.ones(classes)
 beta = np.ones(max_features)
 N_c = np.zeros(classes)
@@ -20,9 +20,9 @@ theta_jc = np.zeros( (max_features, classes) )
 
 def readdata(option):
     if option == 0:
-        #¶ÁÈ¡Ô­Ê¼Êı¾İ¼¯£¨spambase£©
+        #è¯»å–åŸå§‹æ•°æ®é›†ï¼ˆspambaseï¼‰
         data = pd.read_csv("../project1/data/spambase/spambase.data", header = None)
-        # °´ÕÕfrac±ÈÀı·ÖÀëÑµÁ·¼¯¡¢ÑéÖ¤¼¯ºÍ²âÊÔ¼¯
+        # æŒ‰ç…§fracæ¯”ä¾‹åˆ†ç¦»è®­ç»ƒé›†ã€éªŒè¯é›†å’Œæµ‹è¯•é›†
         rows, cols = data.shape
         data = data.sample(frac = 1).reset_index(drop = True)
         sp1 = int(frac1 * rows)
@@ -41,30 +41,30 @@ def training(traindata):
     N = rows
     D = cols - 1
     print("traindata.shape =", rows, cols)
-    # ÑµÁ·theta_c
+    # è®­ç»ƒtheta_c
     for i in range(N):
         c = int(traindata.iat[i, D]) # label
-		# ½«ÓÃÓÚÍ³¼ÆÆµÊıµÄndarray£ºN_cµÄ¶ÔÓ¦Î»¼ÓÒ»
+		# å°†ç”¨äºç»Ÿè®¡é¢‘æ•°çš„ndarrayï¼šN_cçš„å¯¹åº”ä½åŠ ä¸€
         N_c[c] += 1
     alpha_sum = alpha.sum()
 global theta_c
-# ¼ÆËã²ÎÊıtheta_c£¨¿¼ÂÇÏÈÑé·Ö²¼µÄ²ÎÊıalpha£©
+# è®¡ç®—å‚æ•°theta_cï¼ˆè€ƒè™‘å…ˆéªŒåˆ†å¸ƒçš„å‚æ•°alphaï¼‰
     theta_c += (N_c + alpha) / (N + alpha_sum)
     print("theta_c =", theta_c)
-    # ÑµÁ·theta_jc
+    # è®­ç»ƒtheta_jc
     for i in range(N):
         c = int(traindata.iat[i, D]) # label
         for j in range(D):
-			# ½«ÑµÁ·Êı¾İÖĞ¶ÔÓ¦µÚi×éÊı¾İÖĞ´Êj³öÏÖµÄÆµÊı¼Óµ½N_jcÖĞÍ³¼Æ
+			# å°†è®­ç»ƒæ•°æ®ä¸­å¯¹åº”ç¬¬iç»„æ•°æ®ä¸­è¯jå‡ºç°çš„é¢‘æ•°åŠ åˆ°N_jcä¸­ç»Ÿè®¡
             N_jc[j, c] += traindata.iat[i, j]
     beta_sum = beta[ : D].sum()
     for c in range(2):
         total_N_jc = 0
         for j in range(D):
-			# ¼ÆËãtotal_N_jc£¨´ú±í·ÖÀàcÖĞËùÓĞ´ÊjµÄ×Ü³öÏÖ´ÎÊı£©
+			# è®¡ç®—total_N_jcï¼ˆä»£è¡¨åˆ†ç±»cä¸­æ‰€æœ‰è¯jçš„æ€»å‡ºç°æ¬¡æ•°ï¼‰
             total_N_jc += N_jc[j, c];
         for j in range(D):
-			# ¼ÆËã²ÎÊıtheta_jc£¨¿¼ÂÇÏÈÑé·Ö²¼µÄ²ÎÊıbeta£©
+			# è®¡ç®—å‚æ•°theta_jcï¼ˆè€ƒè™‘å…ˆéªŒåˆ†å¸ƒçš„å‚æ•°betaï¼‰
             theta_jc[j, c] = (N_jc[j, c] + beta[j]) / (total_N_jc + beta_sum)
     print("theta_jc =")
     print(theta_jc[ : D])
@@ -85,14 +85,14 @@ def testing(testdata):
         p0 = math.log(theta_c[0])
         p1 = math.log(theta_c[1])
         for j in range(D):
-			# ¼ÆËãp0£¬p1£¨ÔÚlogÏÂ¼ÆËã£¬±ÜÃâ³öÏÖ¾«¶ÈÎÊÌâ£©
+			# è®¡ç®—p0ï¼Œp1ï¼ˆåœ¨logä¸‹è®¡ç®—ï¼Œé¿å…å‡ºç°ç²¾åº¦é—®é¢˜ï¼‰
             p0 += testdata.iat[i, j] * math.log(theta_jc[j, 0])
             p1 += testdata.iat[i, j] * math.log(theta_jc[j, 1])
         classify = 0 if p0 > p1 else 1
         if classify == c:
-			# ¸üĞÂaccurate_sample£¨Í³¼ÆÕıÈ·²âÊÔÑù±¾¸öÊı£©
+			# æ›´æ–°accurate_sampleï¼ˆç»Ÿè®¡æ­£ç¡®æµ‹è¯•æ ·æœ¬ä¸ªæ•°ï¼‰
 accurate_sample += 1
-	# ¼ÆËãÕıÈ·ÂÊaccurate_ratio
+	# è®¡ç®—æ­£ç¡®ç‡accurate_ratio
     accurate_ratio = accurate_sample / total_sample
     print("accurate =", accurate_sample, ", total =", total_sample)
     print("accurate_ratio =", accurate_ratio)
