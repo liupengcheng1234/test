@@ -1,0 +1,100 @@
+import numpy as np
+import pandas as pd
+import math
+from scipy.io import loadmat
+
+计算
+
+classes = 2
+max_features = 10000 - 1 
+#最后一列为分类0/1
+frac1 = 0.8
+frac2 = 0.1 #分配训练集、验证集、测试集比例
+#设置先验参数alpha和beta
+alpha = np.ones(classes)
+beta = np.ones(max_features)
+N_c = np.zeros(classes)
+theta_c = np.zeros(classes)
+N_jc = np.zeros( (max_features, classes) )
+theta_jc = np.zeros( (max_features, classes) )
+
+def readdata(option):
+    if option == 0:
+        #读取原始数据集（spambase）
+        data = pd.read_csv("../project1/data/spambase/spambase.data", header = None)
+        # 按照frac比例分离训练集、验证集和测试集
+        rows, cols = data.shape
+        data = data.sample(frac = 1).reset_index(drop = True)
+        sp1 = int(frac1 * rows)
+        sp2 = int((frac1 + frac2) * rows)
+        traindata = data.iloc[:sp1, :].reset_index(drop = True)
+        validationdata = data.iloc[sp1:sp2, :].reset_index(drop = True)
+        testdata = data.iloc[sp2:, :].reset_index(drop = True)
+        traindata.to_csv("./data/separated/traindata.txt", index = False, header = None)
+        validationdata.to_csv("./data/separated/validationdata.txt", index = False, header = None)
+        testdata.to_csv("./data/separated/testdata.txt", index = False, header = None)
+
+
+def training(traindata):
+    print("===== training =====")
+    rows, cols = traindata.shape
+    N = rows
+    D = cols - 1
+    print("traindata.shape =", rows, cols)
+    # 训练theta_c
+    for i in range(N):
+        c = int(traindata.iat[i, D]) # label
+		# 将用于统计频数的ndarray：N_c的对应位加一
+        N_c[c] += 1
+    alpha_sum = alpha.sum()
+global theta_c
+# 计算参数theta_c（考虑先验分布的参数alpha）
+    theta_c += (N_c + alpha) / (N + alpha_sum)
+    print("theta_c =", theta_c)
+    # 训练theta_jc
+    for i in range(N):
+        c = int(traindata.iat[i, D]) # label
+        for j in range(D):
+			# 将训练数据中对应第i组数据中词j出现的频数加到N_jc中统计
+            N_jc[j, c] += traindata.iat[i, j]
+    beta_sum = beta[ : D].sum()
+    for c in range(2):
+        total_N_jc = 0
+        for j in range(D):
+			# 计算total_N_jc（代表分类c中所有词j的总出现次数）
+            total_N_jc += N_jc[j, c];
+        for j in range(D):
+			# 计算参数theta_jc（考虑先验分布的参数beta）
+            theta_jc[j, c] = (N_jc[j, c] + beta[j]) / (total_N_jc + beta_sum)
+    print("theta_jc =")
+    print(theta_jc[ : D])
+
+def testing(testdata):
+    print("===== testing =====")
+    rows, cols = testdata.shape
+    N = rows
+    D = cols - 1
+    print("testdata.shape =", rows, cols)
+    accurate_sample = 0
+    total_sample = 0
+
+    for i in range(N):
+        total_sample += 1
+        classify = 0
+        c = int(testdata.iat[i, D]) # label
+        p0 = math.log(theta_c[0])
+        p1 = math.log(theta_c[1])
+        for j in range(D):
+			# 计算p0，p1（在log下计算，避免出现精度问题）
+            p0 += testdata.iat[i, j] * math.log(theta_jc[j, 0])
+            p1 += testdata.iat[i, j] * math.log(theta_jc[j, 1])
+        classify = 0 if p0 > p1 else 1
+        if classify == c:
+			# 更新accurate_sample（统计正确测试样本个数）
+accurate_sample += 1
+	# 计算正确率accurate_ratio
+    accurate_ratio = accurate_sample / total_sample
+    print("accurate =", accurate_sample, ", total =", total_sample)
+    print("accurate_ratio =", accurate_ratio)
+
+
