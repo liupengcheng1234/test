@@ -3,7 +3,7 @@ import pandas as pd
 import math
 from scipy.io import loadmat
 
-计算1
+计算
 
 classes = 2
 max_features = 10000 - 1 
