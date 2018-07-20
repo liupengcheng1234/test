@@ -1,0 +1,45 @@
+using namespace cv; //使用OpenCV的命名空间cv
+using namespace std;    //使用标准模板库的命名空间std
+#include <Windows.h>
+aScreenWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+aScreenHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+//定义一个函数，包括升直线和降直线
+ char *function_option[2] = ["rise","fall"];
+    //选择对应的功能
+    char *function_flag = function_option[0];
+    int x[aScreenWidth],y[aScreenHeight];
+    for(i=0;i++i<aScreenWidth){
+        x[i]=i;
+        if (function_flag = "rise")
+            y[i]=(aScreenHeight/aScreenWidth)*i;
+        else if(function_flag = "fall")
+            y[i]=-1*(aScreenHeight/aScreenWidth)*i+aScreenHeight;
+        else
+            exit(0);
+}
+    //初始化视频捕捉器
+    VideoCapture cap; 
+    cap.open("/root/data/crab.mp4");
+    其中双引号中要指出视频文件所在的路径和文件名。
+    // 检查是否开启了摄像头或者视频文件是否打开成功
+    if (!cap.isOpened()) {
+        cerr << "Error，cannot open video.\n";
+        return -1;  }
+    Mat frame;
+    while(true)
+    {
+        // 从摄像头或者视频文件中读取一帧视频图像，并保存在frame中
+        cap.read(frame);
+        // 检查读取是否成功
+        if (frame.empty()) {
+            cerr << "error, video is empty.\n";
+            break;
+        }
+        std::string text = "好好学习，天天向上"；
+        cv::putText(frame, text, origin, font_face, font_scale, cv::Scalar(0, 255, 255), thickness, 8, 0);
+        //在窗口Live中显示当前帧的内容
+        imshow("Live", frame);
+        //当前帧的画面停留50毫秒
+        if (waitKey(50)>= 0)
+            break;  
+}
