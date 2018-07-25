@@ -1,0 +1,126 @@
+
+
+from numpy import *
+def Haffine_from_points(fp,tp):
+    """ 计算H，仿射变换，使得tp 是fp 经过仿射变换H 得到的"""
+    if fp.shape != tp.shape:
+        raise RuntimeError('number of points do not match')
+    对点进行归一化
+    --- 映射起始点---
+    m = mean(fp[:2], axis=1)
+    maxstd = max(std(fp[:2], axis=1)) + 1e-9
+    C1 = diag([1/maxstd, 1/maxstd, 1])
+    C1[0][2] = -m[0]/maxstd
+    C1[1][2] = -m[1]/maxstd
+    fp_cond = dot(C1,fp)
+    --- 映射对应点---
+    m = mean(tp[:2], axis=1)
+    C2 = C1.copy() # 两个点集，必须都进行相同的缩放
+    C2[0][2] = -m[0]/maxstd
+    C2[1][2] = -m[1]/maxstd
+    tp_cond = dot(C2,tp)
+    因为归一化后点的均值为0，所以平移量为0
+    A = concatenate((fp_cond[:2],tp_cond[:2]), axis=0)
+    U,S,V = linalg.svd(A.T)
+    如Hartley 和Zisserman 著的Multiple View Geometry in Computer , Scond Edition 所示，
+    创建矩阵B 和C
+    tmp = V[:2].T
+    B = tmp[:2]
+    C = tmp[2:4]
+    tmp2 = concatenate((dot(C,linalg.pinv(B)),zeros((2,1))), axis=1)
+    H = vstack((tmp2,[0,0,1]))
+    反归一化
+    H = dot(linalg.inv(C2),dot(H,C1))
+    return H / H[2,2]
+'''
+warp.py
+coding=utf-8
+'''
+from numpy import *
+from scipy import ndimage
+import  homography
+def image_in_image(im1,im2,tp):
+    """ 使用仿射变换将im1 放置在im2 上，使im1 图像的角和tp 尽可能的靠近
+    tp 是齐次表示的，并且是按照从左上角逆时针计算的"""
+    扭曲的点
+    m,n = im1.shape[:2]
+    fp = array([[0,m,m,0],[0,0,n,n],[1,1,1,1]])
+    计算仿射变换，并且将其应用于图像im1
+    H = homography.Haffine_from_points(tp,fp)
+    im1_t = ndimage.affine_transform(im1,H[:2,:2],
+        (H[0,2],H[1,2]),im2.shape[:2])
+    alpha = (im1_t > 0)
+    return (1-alpha)*im2 + alpha*im1_t
+
+def alpha_for_triangle(points,m,n):
+    """ 对于带有由points 定义角点的三角形，创建大小为(m，n) 的alpha 图
+    （在归一化的齐次坐标意义下）"""
+    alpha = zeros((m,n))
+    for i in range(min(points[0]),max(points[0])):
+        for j in range(min(points[1]),max(points[1])):
+            x = linalg.solve(points,[i,j,1])
+            if min(x) > 0: # 所有系数都大于零
+                alpha[i,j] = 1
+    return alpha
+
+def two_tri_image_to_image(im1,im2,tp):
+    选定im1 角上的一些点
+    m,n = im1.shape[:2]
+    fp = array([[0,m,m,0],[0,0,n,n],[1,1,1,1]])
+    第一个三角形
+    tp2 = tp[:,:3]
+    fp2 = fp[:,:3]
+    计算H
+    H = homography.Haffine_from_points(tp2,fp2)
+    im1_t = ndimage.affine_transform(im1,H[:2,:2],
+    (H[0,2],H[1,2]),im2.shape[:2])
+    三角形的alpha
+    alpha = alpha_for_triangle(tp2,im2.shape[0],im2.shape[1])
+    im3 = (1-alpha)*im2 + alpha*im1_t
+    第二个三角形
+    tp2 = tp[:,[0,2,3]]
+    fp2 = fp[:,[0,2,3]]
+    计算H
+    H = homography.Haffine_from_points(tp2,fp2)
+    im1_t = ndimage.affine_transform(im1,H[:2,:2],
+    (H[0,2],H[1,2]),im2.shape[:2])
+    三角形的alpha 图像
+    alpha = alpha_for_triangle(tp2,im2.shape[0],im2.shape[1])
+    im4 = (1-alpha)*im3 + alpha*im1_t
+    return im4
+'''
+ch3-2-图像中的图像.py
+coding=utf-8
+'''
+from PIL import Image
+from pylab import *
+from numpy import *
+import os
+import warp
+
+def draw(im):
+    figure()
+    gray()
+    imshow(im)
+    axis('equal')
+    axis('off')
+
+if __name__ == '__main__':
+    path = '.\\pic'
+    pic1_name = 'beatles.jpg'
+    pic2_name = 'billboard_for_rent.jpg'
+    pic1_path = os.path.join(path,pic1_name)
+    pic2_path = os.path.join(path,pic2_name)
+    仿射扭曲im1 到im2 的例子
+    im1 = array(Image.open(pic1_path).convert('L'))
+    im2 = array(Image.open(pic2_path).convert('L'))
+    选定目标点
+    tp = array([[131,274,274,131],[18,16,310,310],[1,1,1,1]])
+    使用普通的仿射变换
+    im3 = warp.image_in_image(im1,im2,tp)
+    draw(im3)
+    使用两个三角形的仿射变换
+    im4 = warp.two_tri_image_to_image(im1,im2,tp)
+    draw(im4)
+    show()
+
