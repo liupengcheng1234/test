@@ -1,34 +1,35 @@
 from PIL import Image
-from pylab import 
-from numpy import 
+from pylab import *
+from numpy import *
 from scipy import ndimage
 import os
 def draw(title,im):
-figure(title)
-gray()
-imshow(im)
-if name == ‘main‘：
+    figure(title)
+    gray()
+    imshow(im)
+    
+if __name__ == '__main__':
 
-path = ‘.\pic’
-pic_name = ‘flowers.jpg’
-pic_path = os.path.join(path,pic_name)
-im = array(image.open(pic_path).convert(‘l’))
-x和y方向均平移-100个像素单位
-h1 = array([[1,0,-100],
-[0,1,-100],
-[0,0,1]])
-im1 = ndimage.affine_transform(im,h1[:2,:2],(h1[0,2],h1[1,2]) ,[400,400])
-图片x和y方向均缩小2倍
-h2 = array([[2,0,0],
-[0,2,0],
-[0,0,1]])
-im2 = ndimage.affine_transform(im,h2[:2,:2],(h2[0,2],h2[1,2]) ,[400,400])
-以原点为中心顺时针旋转60°，并在x方向平移200个单位长度，y方向平移-100个单位长度
-h3 = array([[0.5,-0.866,200],
-[0.866,0.5,-100],
-[0,0,1]])
-im3 = ndimage.affine_transform(im,h3[:2,:2],(h3[0,2],h3[1,2]), [400,400])
-draw(‘translation’,im1)
-draw(‘scale’,im2)
-draw(‘rotation’,im3)
-show()
+    path = '/data'
+    pic_name = 'woman.jpg'
+    pic_path = os.path.join(path,pic_name)
+    im = array(Image.open(pic_path).convert('L'))
+    #x和y方向均平移-100个像素单位
+    h1 = array([[1,0,-100],
+    [0,1,-100],
+    [0,0,1]])
+    im1 = ndimage.affine_transform(im,h1[:2,:2],(h1[0,2],h1[1,2]) ,[400,400])
+    #图片x和y方向均缩小2倍
+    h2 = array([[2,0,0],
+    [0,2,0],
+    [0,0,1]])
+    im2 = ndimage.affine_transform(im,h2[:2,:2],(h2[0,2],h2[1,2]) ,[400,400])
+    #以原点为中心顺时针旋转60°，并在x方向平移200个单位长度，y方向平移-100个单位长度
+    h3 = array([[0.5,-0.866,200],
+    [0.866,0.5,-100],
+    [0,0,1]])
+    im3 = ndimage.affine_transform(im,h3[:2,:2],(h3[0,2],h3[1,2]), [400,400])
+    draw('translation',im1)
+    draw('scale',im2)
+    draw('rotation',im3)
+    show()
